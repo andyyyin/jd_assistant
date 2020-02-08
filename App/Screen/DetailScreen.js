@@ -18,6 +18,10 @@ styles.title1 = {
   fontSize: 26,
   lineHeight: 50,
 }
+styles.titleProm = {
+  ...styles.title1,
+  color: 'green',
+}
 styles.promotionText = {
   fontSize: 18,
   lineHeight: 24,
@@ -57,7 +61,12 @@ export default class DetailsScreen extends React.Component {
         </View>
 
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.title1}>¥{product.price}</Text>
+          <Text style={product.p_price ? styles.titleProm : styles.title1}>
+            ¥{product.p_price || product.price}
+          </Text>
+          {product.p_price &&
+            <Text style={styles.title1}>（¥{product.price}）</Text>
+          }
         </View>
 
         <View style={{marginBottom: 15}}>
@@ -67,11 +76,14 @@ export default class DetailsScreen extends React.Component {
             ))}
           </View>
           <View>
-            {product.moneyOffs && product.moneyOffs.map(({ratePrice, supply}, index) => (
-              <Text style={styles.moneyOffText} key={index}>
-                凑{supply}，单价约：¥{ratePrice}
-              </Text>
-            ))}
+            {product.moneyOffs && product.moneyOffs.map(({ratePrice, supply, isCount}, index) => {
+              let supplyText = isCount ? `${supply}件` : `¥${supply}`
+              return (
+                <Text style={styles.moneyOffText} key={index}>
+                  凑{supplyText}，单价约：¥{ratePrice}
+                </Text>
+              )
+            })}
           </View>
         </View>
 

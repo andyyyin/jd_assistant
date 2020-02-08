@@ -17,11 +17,11 @@ styles.input = {
   flex: 1,
 }
 
-export default ({onSubmit, style}) => {
+export default ({onChange, style}) => {
   return (
     <View style={[styles.container, style]}>
       <TextInput
-        onSubmitEditing={onSubmit}
+        onChangeText={onChange}
         style={styles.input}
       />
     </View>

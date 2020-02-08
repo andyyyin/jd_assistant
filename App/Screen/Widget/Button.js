@@ -20,7 +20,7 @@ styles.title = {
 
 export default ({title, onPress, style}) => {
   return (
-    <TouchableOpacity style={[styles.container, style]}>
+    <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
       <Text style={styles.title}>{title}</Text>
     </TouchableOpacity>
   )

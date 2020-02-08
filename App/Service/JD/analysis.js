@@ -1,6 +1,7 @@
 import {plusOrZero, toMoney, numberFix2} from "../Method"
 
-const promReg = /每?满(\d+)元.*?减(\d+)[元%]/i
+// const promReg = /每?满(\d+)元.*?减(\d+)[元%]/i
+const promReg = /每?满([\d\.]+)([元件]).*?[减打]([\d\.]+)([元%折])/i
 
 
 const fillMoneyOffs = (product) => {
@@ -14,26 +15,34 @@ const fillMoneyOffs = (product) => {
     while (content && (match = content.match(promReg)) && match[0]) {
       const text = match[0]
       const least = Number(match[1])
-      const off = Number(match[2])
+      const unit1 = match[2]
+      const off = Number(match[3])
+      const unit2 = match[4]
+
+      const isCount = unit1 === '件'
       const repeat = text.startsWith('每')
-      const percent = text.endsWith('%')
+      const percent = unit2 === '%'
+      const isDaZhe = unit2 === '折'
 
       let productOff = 0;
       let supply = 0;
 
-      if (least <= price && !repeat && !percent) {
+      if (least <= price && !repeat && !percent && !isDaZhe) {
         productOff = off;
-      } else if (percent) {
-        productOff = toMoney(price * off / 100)
+      } else if (percent || isDaZhe) {
+        const percentRate = isDaZhe ? ((10 - off) / 10) : (off / 100)
+        productOff = toMoney(price * percentRate)
         supply = plusOrZero(least - price)
       } else {
         productOff = toMoney(price * off / least)
         let realLeast = least > price ? least : price + (least - price % least)
-        supply = realLeast - price
+        supply = plusOrZero(realLeast - price)
       }
 
+      if (isCount) supply = least - 1
+
       let ratePrice = numberFix2(price - productOff)
-      moneyOffs.push({text, least, off, percent, repeat, productOff, supply, ratePrice})
+      moneyOffs.push({text, least, off, percent, repeat, isCount, isDaZhe, productOff, supply, ratePrice})
       content = content.split(text)[1]
     }
   })
@@ -70,9 +79,10 @@ const fillCombos = (product) => {
   moneyOffs.forEach(p => {
     tickets.forEach(t => {
       let least = p.least
+      if (p.isCount) least = price
       if (t.quota > least) least = t.quota
       let off = p.off + t.discount
-      if (p.percent) off = least * p.off / 100 + t.discount
+      if (p.percent) off = (least > price ? least : price) * p.off / 100 + t.discount
       if (p.repeat) {
         let repeatCountRaw = least / p.least
         off = p.off * Math.floor(repeatCountRaw) + t.discount
@@ -85,7 +95,7 @@ const fillCombos = (product) => {
           }
         }
       }
-      let supply = least - price
+      let supply = plusOrZero(least - price)
       let productOff = toMoney(price * off / least)
       let ratePrice = numberFix2(price - productOff)
       combos.push({least, off, supply, productOff, ratePrice})
@@ -106,13 +116,13 @@ const fillRankAndPrice = (product) => {
   if (combos && combos.length) all.push(...combos)
   let rank = all.sort((a, b) => b.productOff - a.productOff)
   let deleteIndex
-  while ((deleteIndex = rank.find((p, i) => i > 0 && p.supply >= rank[i - 1].supply))) {
+  console.log(rank)
+  while ((deleteIndex = rank.findIndex((p, i) => i > 0 && p.supply >= rank[i - 1].supply)) && deleteIndex > 0) {
     rank.splice(deleteIndex, 1)
   }
   product.promRank = rank
   let noSupply = rank.find(p => p.supply === 0)
   if (noSupply) product.p_price = noSupply.ratePrice
-  console.log(product.promRank)
 }
 
 
