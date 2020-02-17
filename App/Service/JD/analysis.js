@@ -13,41 +13,77 @@ const fillMoneyOffs = (product) => {
   product.promotions.forEach(({content}) => {
     let match = []
     while (content && (match = content.match(promReg)) && match[0]) {
-      const text = match[0]
-      const least = Number(match[1])
       const unit1 = match[2]
-      const off = Number(match[3])
       const unit2 = match[4]
-
-      const isCount = unit1 === '件'
-      const repeat = text.startsWith('每')
-      const percent = unit2 === '%'
-      const isDaZhe = unit2 === '折'
-
-      let productOff = 0;
-      let supply = 0;
-
-      if (least <= price && !repeat && !percent && !isDaZhe) {
-        productOff = off;
-      } else if (percent || isDaZhe) {
-        const percentRate = isDaZhe ? ((10 - off) / 10) : (off / 100)
-        productOff = toMoney(price * percentRate)
-        supply = plusOrZero(least - price)
-      } else {
-        productOff = toMoney(price * off / least)
-        let realLeast = least > price ? least : price + (least - price % least)
-        supply = plusOrZero(realLeast - price)
+      const text = match[0]
+      const params = {
+        price,
+        text,
+        least: Number(match[1]),
+        off: Number(match[3]),
+        isCount: unit1 === '件',
+        repeat: text.startsWith('每'),
+        percent: unit2 === '%',
+        isDaZhe: unit2 === '折'
       }
-
-      if (isCount) supply = least - 1
-
-      let ratePrice = numberFix2(price - productOff)
-      moneyOffs.push({text, least, off, percent, repeat, isCount, isDaZhe, productOff, supply, ratePrice})
-      content = content.split(text)[1]
+      moneyOffs.push(buildMoneyOff(params))
+      // repeat情况可能需产生两条money off，在此追加一条
+      if (params.repeat && params.least < price) {
+        params.repeat = false
+        params.least = price - (price % params.least)
+        moneyOffs.push(buildMoneyOff(params))
+      }
+      content = content.split(params.text)[1]
     }
   })
 
   product.moneyOffs = moneyOffs
+}
+
+const buildMoneyOff = (params) => {
+  const {price, text, least, off, isCount, repeat, percent, isDaZhe} = params
+
+  let productOff = 0;
+  let supply = 0;
+  let pureOff = 0;
+
+  if (least <= price && !repeat && !percent && !isDaZhe) {
+    productOff = off;
+
+    // pure off add
+    if (!isCount || least === 1) {
+      pureOff = off;
+    }
+  } else if (percent || isDaZhe) {
+    const percentRate = isDaZhe ? ((10 - off) / 10) : (off / 100)
+    productOff = toMoney(price * percentRate)
+    supply = plusOrZero(least - price)
+
+    // pure off add
+    if (isCount && least === 1) {
+      pureOff = productOff
+    } else if (!isCount) {
+      let realOff = least * percentRate
+      pureOff = plusOrZero(realOff - supply)
+    }
+  } else {
+    productOff = toMoney(price * off / least)
+    let realLeast = least > price ? least : price + (least - price % least)
+    supply = plusOrZero(realLeast - price)
+
+    // pure off add
+    if (!isCount) {
+      let realOff = repeat ? off * (realLeast / least) : off
+      pureOff = plusOrZero(realOff - supply)
+    }
+  }
+
+  if (isCount) {
+    supply = least - 1
+  }
+
+  let ratePrice = numberFix2(price - productOff)
+  return {text, least, off, percent, repeat, isCount, isDaZhe, productOff, supply, ratePrice, pureOff}
 }
 
 const fillTickets = (product) => {
@@ -57,14 +93,19 @@ const fillTickets = (product) => {
     product.tickets = product.tickets.map(({quota, discount, text}) => {
       let productOff = 0
       let supply = 0
+      let pureOff = 0
       if (quota <= price) {
         productOff = discount
+        pureOff = discount
       } else {
         productOff = toMoney(price * discount / quota)
         supply = quota - price
+        if (supply < discount) {
+          pureOff = discount - supply
+        }
       }
       let ratePrice = numberFix2(price - productOff)
-      return {quota, discount, text, productOff, supply, ratePrice}
+      return {quota, discount, text, productOff, supply, ratePrice, pureOff}
     })
   }
 }
@@ -98,7 +139,13 @@ const fillCombos = (product) => {
       let supply = plusOrZero(least - price)
       let productOff = toMoney(price * off / least)
       let ratePrice = numberFix2(price - productOff)
-      combos.push({least, off, supply, productOff, ratePrice})
+
+      // pure off add
+      let pureOff = 0
+      if (!p.isCount || (p.isCount && p.least === 1)) {
+        pureOff = plusOrZero(off - supply)
+      }
+      combos.push({least, off, supply, productOff, ratePrice, pureOff})
     })
   })
   if (combos.length > 1) {
@@ -110,6 +157,9 @@ const fillCombos = (product) => {
 
 const fillRankAndPrice = (product) => {
   const {moneyOffs, tickets, combos} = product
+
+  const price = Number(product.price)
+
   const all = []
   if (moneyOffs && moneyOffs.length) all.push(...moneyOffs)
   if (tickets && tickets.length) all.push(...tickets)
@@ -121,18 +171,25 @@ const fillRankAndPrice = (product) => {
     rank.splice(deleteIndex, 1)
   }
   product.promRank = rank
-  let noSupply = rank.find(p => p.supply === 0)
-  if (noSupply) product.p_price = noSupply.ratePrice
+  // let noSupply = rank.find(p => p.supply === 0)
+  // if (noSupply) product.p_price = noSupply.ratePrice
+  all.forEach(p => {
+    if (!p.pureOff) return
+    let p_price = price - p.pureOff
+    if (p_price < (product.p_price || price)) product.p_price = p_price
+  })
+  if (product.p_price) product.p_price = numberFix2(product.p_price)
 }
 
 
 export default (_productMap) => {
   if (!_productMap) return
   const list = Object.values(_productMap)
-  list.map(product => {
+  list.filter(p => !p.analyzed).map(product => {
     fillMoneyOffs(product)
     fillTickets(product)
     fillCombos(product)
     fillRankAndPrice(product)
+    product.analyzed = true
   })
 }

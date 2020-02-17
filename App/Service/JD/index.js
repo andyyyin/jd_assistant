@@ -9,19 +9,23 @@ let _storeData = null;
 const loadProductIds = async () => {
 
   // await saveJDData({
-  //   idList: [
-  //     1284887,
-  //     851672,
-  //     744594,
-  //     100004922092,
-  //     844099,
-  //     3649920,
-  //   ]
+  //   idConfig: {
+  //     1284887: newConfig(),
+  //     851672: newConfig(),
+  //     744594: newConfig(),
+  //     100004922092: newConfig(),
+  //     844099: newConfig(),
+  //     3649920: newConfig(),
+  //   }
   // })
 
   if (!_storeData) _storeData = await loadJDData()
-  if (!_storeData) await saveJDData({idList: []})
-  return _storeData.idList
+  if (!_storeData) {
+    _storeData = {idConfig: {}}
+    await saveJDData(_storeData)
+  }
+  const {idConfig} = _storeData
+  return Object.keys(idConfig).filter(id => idConfig[id].active)
 }
 
 const saveData = () => {
@@ -35,17 +39,32 @@ const getPromotion = promotionData => {
   return promoList.map(({content}) => ({content}))
 }
 
+const newConfig = () => {
+  return {active: true, start: Date.now()}
+}
+
 jd.addProductId = async (id) => {
-  _storeData.idList.push(id)
+  _storeData.idConfig[id] = newConfig()
   await saveData()
-  // todo 同步
+  await jd.loadProducts(id)
+  return _productMap
+}
+
+jd.deleteProduct = async (id) => {
+  _storeData.idConfig[id].active = false
+  _storeData.idConfig[id].delete = Date.now()
+  await saveData();
+  delete _productMap[id]
+  return _productMap
 }
 
 jd.getProduct = (id) => _productMap[id]
 
-jd.loadProducts = async () => {
+jd.loadProducts = async (id) => {
 
-  const ids = await loadProductIds()
+  const ids = id ?
+    [id] :
+    await loadProductIds()
 
   const product = await api.getProduct2(ids.join(','));
   // console.log(product)

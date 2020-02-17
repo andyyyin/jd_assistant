@@ -17,3 +17,11 @@ export const saveJDData = (data) => {
 }
 
 export const clearJDData = () => AsyncStorage.removeItem(DATA_NAME)
+
+export const compareAndSaveProduct = (product) => {
+  const {id, price, p_price} = data
+}
+
+export const saveProductData = (data) => {
+  const {id, price, p_price} = data
+}
