@@ -8,16 +8,17 @@ let _storeData = null;
 
 const loadProductIds = async () => {
 
-  // await saveJDData({
-  //   idConfig: {
-  //     1284887: newConfig(),
-  //     851672: newConfig(),
-  //     744594: newConfig(),
-  //     100004922092: newConfig(),
-  //     844099: newConfig(),
-  //     3649920: newConfig(),
-  //   }
-  // })
+  await saveJDData({
+    idConfig: {
+      // 1284887: newConfig(),
+      // 851672: newConfig(),
+      // 744594: newConfig(),
+      // 100004922092: newConfig(),
+      // 844099: newConfig(),
+      // 3649920: newConfig(),
+      100003312839: newConfig(),
+    }
+  })
 
   if (!_storeData) _storeData = await loadJDData()
   if (!_storeData) {

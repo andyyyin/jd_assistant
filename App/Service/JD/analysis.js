@@ -1,4 +1,4 @@
-import {plusOrZero, toMoney, numberFix2} from "../Method"
+import {plusOrZero, toMoney, numberFix2} from "../Function"
 
 // const promReg = /每?满(\d+)元.*?减(\d+)[元%]/i
 const promReg = /每?满([\d\.]+)([元件]).*?[减打]([\d\.]+)([元%折])/i
@@ -166,7 +166,6 @@ const fillRankAndPrice = (product) => {
   if (combos && combos.length) all.push(...combos)
   let rank = all.sort((a, b) => b.productOff - a.productOff)
   let deleteIndex
-  console.log(rank)
   while ((deleteIndex = rank.findIndex((p, i) => i > 0 && p.supply >= rank[i - 1].supply)) && deleteIndex > 0) {
     rank.splice(deleteIndex, 1)
   }
@@ -179,6 +178,7 @@ const fillRankAndPrice = (product) => {
     if (p_price < (product.p_price || price)) product.p_price = p_price
   })
   if (product.p_price) product.p_price = numberFix2(product.p_price)
+  console.log(product)
 }
 
 

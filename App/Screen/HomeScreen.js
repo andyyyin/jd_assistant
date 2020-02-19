@@ -1,8 +1,9 @@
 import React from 'react';
-import {StatusBar, Text, View, Image, TouchableOpacity, ScrollView,
+import {StatusBar, Text, View, Image, TouchableOpacity, ScrollView, Clipboard, Button,
   KeyboardAvoidingView, SafeAreaView, Alert, TouchableWithoutFeedback} from "react-native"
-import jd from "../Service/JD"
 import { SwipeListView } from 'react-native-swipe-list-view'
+import jd from "../Service/JD"
+import JDTask from '../Service/JD/task'
 
 import {Ticket, GInput, GButton} from "./Widget"
 
@@ -31,8 +32,18 @@ export default class HomeScreen extends React.Component {
       idInput: null,
       products: null,
       loading: false,
+      testData: null,
     }
     this.load().then()
+  }
+
+  static navigationOptions = ({ navigation, screenProps }) => ({
+    title: "Home",
+    headerRight: () => <Button title="Log" onPress={()=>{ navigation.navigate('Log'); }} />,
+  })
+
+  componentDidMount(): void {
+    JDTask.init().then()
   }
 
   load = async () => {
