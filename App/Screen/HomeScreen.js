@@ -52,6 +52,7 @@ export default class HomeScreen extends React.Component {
   }
 
   setProductFromMap = (productMap) => {
+    console.log(productMap)
     const products = Object.values(productMap)
     this.setState({products})
   }
