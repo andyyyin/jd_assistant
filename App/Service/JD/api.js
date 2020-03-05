@@ -51,8 +51,13 @@ const deleteProduct = (pid) => {
   return postJD('/delete', {pid})
 }
 
+const loadHistory = (pid) => {
+  return getJD(`/${pid}/history`)
+}
+
 export default {
   getProductMap,
   addProductId,
-  deleteProduct
+  deleteProduct,
+  loadHistory
 }

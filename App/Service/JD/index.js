@@ -17,9 +17,14 @@ const loadProducts = async () => {
   return (_productMap = await api.getProductMap())
 }
 
+const loadHistory = (id) => {
+  return api.loadHistory(id)
+}
+
 export default {
   addProductId,
   deleteProduct,
   getProduct,
   loadProducts,
+  loadHistory,
 };
