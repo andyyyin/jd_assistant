@@ -1,5 +1,5 @@
 import React from 'react';
-import {StatusBar, Text, View, Image, TouchableOpacity, ScrollView, Clipboard, Button,
+import {StatusBar, Text, View, Image, TouchableOpacity, ScrollView, RefreshControl, Button,
   KeyboardAvoidingView, SafeAreaView, Alert, TouchableWithoutFeedback} from "react-native"
 import { SwipeListView } from 'react-native-swipe-list-view'
 import jd from "../Service/JD"
@@ -38,7 +38,7 @@ export default class HomeScreen extends React.Component {
   }
 
   static navigationOptions = ({ navigation, screenProps }) => ({
-    title: "Home",
+    title: "清单",
     headerRight: () => <Button title="Log" onPress={()=>{ navigation.navigate('Log'); }} />,
   })
 
@@ -49,6 +49,13 @@ export default class HomeScreen extends React.Component {
   load = async () => {
     const productMap = await jd.loadProducts()
     this.setProductFromMap(productMap)
+  }
+  refresh = () => {
+    this.setState({loading: true}, () => {
+      this.load().then(() => {
+        this.setState({loading: false})
+      })
+    })
   }
 
   setProductFromMap = (productMap) => {
@@ -109,6 +116,12 @@ export default class HomeScreen extends React.Component {
 
             <SwipeListView
               data={this.state.products}
+              refreshControl={
+                <RefreshControl
+                  refreshing={false}
+                  onRefresh={this.refresh}
+                />
+              }
               renderItem={ ({item: product}, rowMap) => (
                 <TouchableWithoutFeedback
                   key={product.id}
