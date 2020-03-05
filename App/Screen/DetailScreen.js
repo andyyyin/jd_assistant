@@ -1,8 +1,9 @@
 import React from 'react';
-import {Text, View, Image, Linking, Button, ScrollView} from "react-native"
+import {Text, View, Image, Linking, Button, ScrollView, SafeAreaView} from "react-native"
 import {LineChart} from "react-native-chart-kit";
 import jd from "../Service/JD"
 import GlobalStyle from '../Style'
+import {bgLocalLog} from "../Service/localLog"
 
 import {Ticket} from "./Widget"
 
@@ -40,6 +41,12 @@ styles.moneyOffText = {
 const getPlusDay = (date, plus) => {
   if (!plus) plus = 1
   return new Date(date.getTime() + (plus * (24 * 60 * 60 * 1000)))
+}
+
+const dateToLabel = (date) => {
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return month + '.' + day
 }
 
 const linkToJDApp = (pid) => {
@@ -85,20 +92,15 @@ export default class DetailsScreen extends React.Component {
 
   setHistoryData = (history) => {
     if (!history || history.length < 2) return
-    let startLabel = history[0].date
-    let endLabel = history[history.length - 1].date
-    const labels = [startLabel]
+    let day = new Date(parseInt(history[0].dayTime))
+    const labels = [dateToLabel(day)]
     const priceSets = [history[0].price]
     const promSets = [history[0].prom]
 
-    let date = new Date(`2020.${startLabel}`)
-    let labelTemp = null
-    while (labelTemp !== endLabel && labels.length < 180) {
-      date = getPlusDay(date)
-      labelTemp = (date.getMonth() + 1) + '.' + date.getDay()
-      labels.push(labelTemp)
+    while ((day = getPlusDay(day)).getTime() < Date.now() && labels.length < 180) {
+      labels.push(dateToLabel(day))
       let targetHistory
-      if ((targetHistory = history.find(h => h.date === labelTemp))) {
+      if ((targetHistory = history.find(h => parseInt(h.dayTime) === day.getTime()))) {
         priceSets.push(targetHistory.price)
         promSets.push(targetHistory.prom)
       } else {
@@ -113,7 +115,7 @@ export default class DetailsScreen extends React.Component {
     const {product, history, labels, priceSets, promSets} = this.state
     if (!product) return <View/>
     return (
-      <View style={{flex: 1, backgroundColor: '#fff'}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
         <View style={styles.titleRow}>
           <Image source={{uri: product.imgUrl}} style={{width: 120, height: 120}}/>
           <View style={{paddingHorizontal: 10, flex: 1}}>
@@ -220,7 +222,7 @@ export default class DetailsScreen extends React.Component {
           }
         </View>
 
-      </View>
+      </SafeAreaView>
     );
   }
 }

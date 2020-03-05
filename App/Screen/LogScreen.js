@@ -34,6 +34,7 @@ export default class LogScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView>
+          <Text style={{color: '#999'}}>version: 2020.3.6</Text>
           {this.state.data &&
             <View>
               {this.state.data.map(one => (
