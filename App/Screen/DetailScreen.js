@@ -16,8 +16,8 @@ styles.titleRow = {
 }
 
 styles.name = {
-  fontSize: 24,
-  lineHeight: 30,
+  fontSize: 16,
+  lineHeight: 20,
 }
 styles.title1 = {
   fontSize: 26,
@@ -51,11 +51,7 @@ const dateToLabel = (date) => {
 
 const linkToJDApp = (pid) => {
   const url = `openapp.jdmobile://virtual?params={"des":"productDetail","skuId":"${pid}","category":"jump"}`
-  Linking.canOpenURL(url).then(() => {
-    Linking.openURL(url)
-  }).catch(() => {
-    alert('未找到京东App')
-  })
+  Linking.openURL(url).then().catch(() => { alert('未找到京东App') })
 }
 
 export default class DetailsScreen extends React.Component {
@@ -91,7 +87,7 @@ export default class DetailsScreen extends React.Component {
   }
 
   setHistoryData = (history) => {
-    if (!history || history.length < 2) return
+    if (!history || !history.length || history.length < 2) return
     let day = new Date(parseInt(history[0].dayTime))
     const labels = [dateToLabel(day)]
     const priceSets = [history[0].price]
@@ -111,6 +107,14 @@ export default class DetailsScreen extends React.Component {
     this.setState({history, labels, priceSets, promSets})
   }
 
+  // onNameTextLayout = (event) => {
+  //   let {height} = event.nativeEvent.layout
+  //   if (height > 122) {
+  //     let {nameFontSize} = this.state
+  //     this.setState({nameFontSize: nameFontSize - 2})
+  //   }
+  // }
+
   render() {
     const {product, history, labels, priceSets, promSets} = this.state
     if (!product) return <View/>
@@ -119,7 +123,9 @@ export default class DetailsScreen extends React.Component {
         <View style={styles.titleRow}>
           <Image source={{uri: product.imgUrl}} style={{width: 120, height: 120}}/>
           <View style={{paddingHorizontal: 10, flex: 1}}>
-            <Text style={styles.name}>{product.name}</Text>
+            <Text style={styles.name}>
+              {product.name}
+            </Text>
           </View>
         </View>
 
