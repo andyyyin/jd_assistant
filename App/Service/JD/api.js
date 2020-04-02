@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {API_ROOT} from "./constant"
+import {API_ROOT} from "../../info"
 
 const waitTime = (time) => {
   return new Promise(resolve => {
