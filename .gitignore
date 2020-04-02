@@ -59,4 +59,4 @@ buck-out/
 /ios/Pods/
 
 # custom
-/App/indo.json
+/App/indo.js
