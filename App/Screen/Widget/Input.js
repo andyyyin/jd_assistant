@@ -13,6 +13,7 @@ styles.container = {
 }
 
 styles.input = {
+  color: '#111',
   fontSize: 16,
   flex: 1,
 }

@@ -46,7 +46,7 @@ const getPlusDay = (date, plus) => {
 const dateToLabel = (date) => {
   const month = date.getMonth() + 1
   const day = date.getDate()
-  return month + '.' + day
+  return (day > 9 ? '' : month) + '.' + day
 }
 
 const linkToJDApp = (pid) => {
@@ -89,7 +89,7 @@ export default class DetailsScreen extends React.Component {
   setHistoryData = (history) => {
     if (!history || !history.length || history.length < 2) return
     let day = new Date(parseInt(history[0].dayTime))
-    const labels = [dateToLabel(day)]
+    let labels = [dateToLabel(day)]
     const priceSets = [history[0].price]
     const promSets = [history[0].prom]
 
@@ -104,6 +104,14 @@ export default class DetailsScreen extends React.Component {
         promSets.push(promSets[promSets.length - 1])
       }
     }
+
+    let jump = 0;
+    if (labels.length > 15) jump = 1
+    if (labels.length > 30) jump = 2
+    labels = labels.map((l, index) => {
+      return index % (jump + 1) === 0 ? l : '';
+    })
+
     this.setState({history, labels, priceSets, promSets})
   }
 
