@@ -1,7 +1,8 @@
 import api from './api';
 
-let _productMap = {};
+const available = api.available
 
+let _productMap = {};
 
 const addProductId = async (id) => {
   return (_productMap = await api.addProductId(id))
@@ -27,4 +28,5 @@ export default {
   getProduct,
   loadProducts,
   loadHistory,
+  available,
 };

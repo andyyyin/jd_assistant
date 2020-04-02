@@ -1,11 +1,13 @@
 import React from 'react';
 import {Text, View, Image, Linking, Button, ScrollView, SafeAreaView} from "react-native"
 import {LineChart} from "react-native-chart-kit";
-import jd from "../Service/JD"
+import jdRemote from "../Service/JD"
+import jdLocal from "../Service/JD_Local"
 import GlobalStyle from '../Style'
 import {bgLocalLog} from "../Service/localLog"
-
 import {Ticket} from "./Widget"
+
+const jd = jdRemote.available ? jdRemote : jdLocal
 
 const styles = {
   ...GlobalStyle,

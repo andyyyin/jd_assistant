@@ -2,10 +2,12 @@ import React from 'react';
 import {StatusBar, Text, View, Image, TouchableOpacity, ScrollView, RefreshControl, Button,
   KeyboardAvoidingView, SafeAreaView, Alert, TouchableWithoutFeedback} from "react-native"
 import { SwipeListView } from 'react-native-swipe-list-view'
-import jd from "../Service/JD"
+import jdRemote from "../Service/JD"
+import jdLocal from "../Service/JD_Local"
 import JDTask from '../Service/JD/task'
-
 import {Ticket, GInput, GButton} from "./Widget"
+
+const jd = jdRemote.available ? jdRemote : jdLocal
 
 const styles = {}
 styles.productContainer = {

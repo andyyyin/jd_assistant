@@ -1,6 +1,8 @@
 import axios from 'axios';
 import {API_ROOT} from "../../info"
 
+const available = !!API_ROOT
+
 const waitTime = (time) => {
   return new Promise(resolve => {
     setTimeout(resolve, time)
@@ -59,5 +61,6 @@ export default {
   getProductMap,
   addProductId,
   deleteProduct,
-  loadHistory
+  loadHistory,
+  available,
 }
