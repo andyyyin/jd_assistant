@@ -4,7 +4,7 @@
 
 [yarn安装方法](https://classic.yarnpkg.com/zh-Hans/docs/install/)
 
-### 3.安装yarn
+### 3.安装CocoaPods
 [CocoaPods安装方法](https://guides.cocoapods.org/using/getting-started.html)
 
 ### 4.下载依赖库
