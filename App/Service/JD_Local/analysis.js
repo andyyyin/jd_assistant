@@ -123,7 +123,10 @@ const fillCombos = (product) => {
       if (p.isCount) least = price
       if (t.quota > least) least = t.quota
       let off = p.off + t.discount
-      if (p.percent) off = (least > price ? least : price) * p.off / 100 + t.discount
+      if (p.percent || p.isDaZhe) {
+        let percent = p.isDaZhe ? (10 - p.off) * 10 : p.off
+        off = (least > price ? least : price) * (percent / 100) + t.discount
+      }
       if (p.repeat) {
         let repeatCountRaw = least / p.least
         off = p.off * Math.floor(repeatCountRaw) + t.discount

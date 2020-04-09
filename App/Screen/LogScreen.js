@@ -1,8 +1,13 @@
 import React from 'react';
 import {Text, View, Image, SafeAreaView, ScrollView} from "react-native"
 import {loadLocalLog} from "../Service/localLog"
+import DeviceInfo from 'react-native-device-info';
+import {copyText} from "./Function"
 
 const styles = {}
+
+
+const DeviceId = DeviceInfo.getUniqueId();
 
 const parseTime = (time) => {
   let date = new Date(time)
@@ -34,7 +39,7 @@ export default class LogScreen extends React.Component {
     return (
       <SafeAreaView>
         <ScrollView>
-          <Text style={{color: '#999'}}>version: 2020.3.6</Text>
+          <Text style={{color: '#999'}} onPress={() => {copyText(DeviceId)}}>{DeviceId}</Text>
           {this.state.data &&
             <View>
               {this.state.data.map(one => (

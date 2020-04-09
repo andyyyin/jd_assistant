@@ -8,17 +8,18 @@ let _storeData = null;
 
 const loadProductIds = async () => {
 
-  // await saveJDData({
-  //   idConfig: {
-  //     1284887: newConfig(),
-  //     851672: newConfig(),
-  //     744594: newConfig(),
-  //     100004922092: newConfig(),
-  //     844099: newConfig(),
-  //     3649920: newConfig(),
-  //     100003312839: newConfig(),
-  //   }
-  // })
+  await saveJDData({
+    idConfig: {
+      // 1284887: newConfig(),
+      // 851672: newConfig(),
+      // 744594: newConfig(),
+      // 100004922092: newConfig(),
+      // 844099: newConfig(),
+      // 3649920: newConfig(),
+      // 100003312839: newConfig(),
+      1813109: newConfig(),
+    }
+  })
 
   if (!_storeData) _storeData = await loadJDData()
   if (!_storeData) {
@@ -63,7 +64,7 @@ jd.addProductId = async (id) => {
     _storeData.idConfig[id] = newConfig()
     await saveData()
   }
-  return _productMap
+  return Object.values(_productMap)
 }
 
 jd.deleteProduct = async (id) => {
@@ -71,7 +72,7 @@ jd.deleteProduct = async (id) => {
   _storeData.idConfig[id].delete = Date.now()
   await saveData();
   delete _productMap[id]
-  return _productMap
+  return Object.values(_productMap)
 }
 
 jd.getProduct = (id) => _productMap[id]
@@ -115,7 +116,7 @@ jd.loadProducts = async (id) => {
     coupons.forEach(c => {
       const {quota, discount} = c
       let text = ' - 未知 - '
-      if (quota && discount) {
+      if (!isNaN(quota) && !isNaN(discount)) {
         text = `满${c.quota}减${c.discount}`
       }
       if (!tickets.find(t => t.quota === quota && t.discount === discount)) {
@@ -134,7 +135,7 @@ jd.loadProducts = async (id) => {
 
   await saveRecords(_productMap)
 
-  return _productMap
+  return Object.values(_productMap)
 }
 
 jd.loadHistory = getProductHistory

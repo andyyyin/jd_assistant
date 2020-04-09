@@ -49,8 +49,8 @@ export default class HomeScreen extends React.Component {
   }
 
   load = async () => {
-    const productMap = await jd.loadProducts()
-    this.setProductFromMap(productMap)
+    const productList = await jd.loadProducts()
+    this.setProductFromList(productList)
   }
   refresh = () => {
     this.setState({loading: true}, () => {
@@ -60,9 +60,9 @@ export default class HomeScreen extends React.Component {
     })
   }
 
-  setProductFromMap = (productMap) => {
-    console.log(productMap)
-    const products = Object.values(productMap)
+  setProductFromList = (productList) => {
+    console.log(productList)
+    const products = productList
     this.setState({products})
   }
 
@@ -89,19 +89,19 @@ export default class HomeScreen extends React.Component {
   }
 
   deleteProduct = ({id}) => {
-    jd.deleteProduct(id).then(this.setProductFromMap)
+    jd.deleteProduct(id).then(this.setProductFromList)
   }
 
   idSubmit = (idInput) => this.setState({idInput})
 
   addProduct = async () => {
     const {idInput} = this.state
-    if (isNaN(idInput)) {
+    if (!idInput || isNaN(idInput)) {
       // todo check fail
       return
     }
     this.setState({loading: true})
-    await jd.addProductId(idInput).then(this.setProductFromMap)
+    await jd.addProductId(idInput).then(this.setProductFromList)
     this.setState({loading: false})
   }
 

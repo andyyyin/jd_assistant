@@ -1,7 +1,9 @@
 import axios from 'axios';
 import {API_ROOT} from "../../info"
+import DeviceInfo from 'react-native-device-info';
 
 const available = !!API_ROOT
+const DeviceId = DeviceInfo.getUniqueId();
 
 const waitTime = (time) => {
   return new Promise(resolve => {
@@ -10,7 +12,9 @@ const waitTime = (time) => {
 }
 
 const jdRequest = async ({url, method, params}) => {
-  const headers = {}
+  const headers = {
+    'Authorization': DeviceId,
+  }
   try {
     const response = await axios({
       url: API_ROOT + url,
@@ -20,13 +24,22 @@ const jdRequest = async ({url, method, params}) => {
     })
     return response.data
   } catch (e) {
-    if (e.response && e.response.data && e.response.data === 'pending') {
-      await waitTime(2000)
-      console.log('retry') // todo
-      return jdRequest({url, method, params})
+
+    if (e.response && e.response.data) {
+      const res = e.response
+      if (res.data === 'pending') {
+        await waitTime(2000)
+        console.log('retry') // todo
+        return jdRequest({url, method, params})
+      } else if (res.status === 401) {
+        alert('无权限访问')
+      } else {
+        alert(e.message)
+      }
     } else {
       alert(e.message)
     }
+
   }
 }
 
@@ -41,7 +54,7 @@ const postJD = (url, params) => {
   return jdRequest({url, method, params})
 }
 
-const getProductMap = async () => {
+const getProductList = async () => {
   return getJD('/')
 }
 
@@ -58,7 +71,7 @@ const loadHistory = (pid) => {
 }
 
 export default {
-  getProductMap,
+  getProductList,
   addProductId,
   deleteProduct,
   loadHistory,

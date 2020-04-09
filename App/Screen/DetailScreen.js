@@ -30,13 +30,13 @@ styles.titleProm = {
   color: 'green',
 }
 styles.promotionText = {
-  fontSize: 18,
-  lineHeight: 24,
+  fontSize: 16,
+  lineHeight: 20,
   color: 'red'
 }
 styles.moneyOffText = {
-  fontSize: 18,
-  lineHeight: 24,
+  fontSize: 16,
+  lineHeight: 20,
   color: 'blue'
 }
 
@@ -70,7 +70,7 @@ export default class DetailsScreen extends React.Component {
 
   static navigationOptions = ({ navigation, screenProps }) => ({
     title: "详情",
-    headerRight: () => <Button title="Link" onPress={()=>{ linkToJDApp(navigation.getParam('id')) }} />,
+    headerRight: () => <Button title="打开京东" onPress={()=>{ linkToJDApp(navigation.getParam('id')) }} />,
   })
 
   componentDidMount(): void {
@@ -148,57 +148,60 @@ export default class DetailsScreen extends React.Component {
           }
         </View>
 
-        <ScrollView>
+        <ScrollView style={{backgroundColor: '#eee'}}>
 
-          <View style={{marginBottom: 15}}>
-            <View>
-              {product.promotions && product.promotions.map(({content}, index) => (
-                <Text style={styles.promotionText} key={index}>{content}</Text>
-              ))}
-            </View>
-            <View>
-              {product.moneyOffs && product.moneyOffs.map(({ratePrice, supply, isCount}, index) => {
-                let supplyText = isCount ? `${supply}件` : `¥${supply}`
-                return (
-                  <Text style={styles.moneyOffText} key={index}>
-                    凑{supplyText}，单价约：¥{ratePrice}
-                  </Text>
-                )
-              })}
-            </View>
-          </View>
+          <View style={{paddingTop: 5, paddingHorizontal: 10}}>
 
-          <View style={{marginBottom: 15}}>
-            <View style={{flexDirection: 'row'}}>
-              {product.tickets && product.tickets.map(({text}, index) => (
-                <View style={{marginRight: 5,}} key={index}>
-                  <Ticket text={text} size={16}/>
-                </View>
-              ))}
-            </View>
-            <View>
-              {product.tickets && product.tickets.map(({ratePrice, supply}, index) => (
-                <Text style={styles.moneyOffText} key={index}>
-                  凑{supply}，单价约：¥{ratePrice}
-                </Text>
-              ))}
-            </View>
-          </View>
-
-          {product.combos &&
             <View style={{marginBottom: 15}}>
               <View>
-                <Text style={styles.promotionText}>组合：</Text>
+                {product.promotions && product.promotions.map(({content}, index) => (
+                  <Text style={styles.promotionText} key={index}>{content}</Text>
+                ))}
               </View>
               <View>
-                {product.combos && product.combos.map(({ratePrice, supply}, index) => (
+                {product.moneyOffs && product.moneyOffs.map(({ratePrice, supply, isCount}, index) => {
+                  let supplyText = isCount ? `${supply}件` : `¥${supply}`
+                  return (
+                    <Text style={styles.moneyOffText} key={index}>
+                      凑{supplyText}，单价约：¥{ratePrice}
+                    </Text>
+                  )
+                })}
+              </View>
+            </View>
+
+            <View style={{marginBottom: 15}}>
+              <View style={{flexDirection: 'row'}}>
+                {product.tickets && product.tickets.map(({text}, index) => (
+                  <View style={{marginRight: 5,}} key={index}>
+                    <Ticket text={text} size={16}/>
+                  </View>
+                ))}
+              </View>
+              <View>
+                {product.tickets && product.tickets.map(({ratePrice, supply}, index) => (
                   <Text style={styles.moneyOffText} key={index}>
                     凑{supply}，单价约：¥{ratePrice}
                   </Text>
                 ))}
               </View>
             </View>
-          }
+
+            {product.combos &&
+              <View style={{marginBottom: 15}}>
+                <View>
+                  <Text style={styles.promotionText}>组合：</Text>
+                </View>
+                <View>
+                  {product.combos && product.combos.map(({ratePrice, supply}, index) => (
+                    <Text style={styles.moneyOffText} key={index}>
+                      凑{supply}，单价约：¥{ratePrice}
+                    </Text>
+                  ))}
+                </View>
+              </View>
+            }
+          </View>
         </ScrollView>
         <View>
           {history && history.length > 1 &&

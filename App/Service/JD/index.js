@@ -2,20 +2,22 @@ import api from './api';
 
 const available = api.available
 
-let _productMap = {};
+let _productList = [];
 
 const addProductId = async (id) => {
-  return (_productMap = await api.addProductId(id))
+  return (_productList = await api.addProductId(id))
 }
 
 const deleteProduct = async (id) => {
-  return (_productMap = await api.deleteProduct(id))
+  return (_productList = await api.deleteProduct(id))
 }
 
-const getProduct = (id) => _productMap[id]
+const getProduct = (id) => {
+  return _productList.find(p => p.id === id)
+}
 
 const loadProducts = async () => {
-  return (_productMap = await api.getProductMap())
+  return (_productList = await api.getProductList())
 }
 
 const loadHistory = (id) => {
