@@ -10,6 +10,7 @@ styles.container = {
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
+  paddingHorizontal: 10,
   minWidth: 50,
 }
 

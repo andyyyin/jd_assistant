@@ -18,11 +18,12 @@ styles.input = {
   flex: 1,
 }
 
-export default ({onChange, style}) => {
+export default ({onChange, style, placeholder}) => {
   return (
     <View style={[styles.container, style]}>
       <TextInput
         onChangeText={onChange}
+        placeholder={placeholder}
         style={styles.input}
       />
     </View>

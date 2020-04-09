@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, Image, SafeAreaView, ScrollView} from "react-native"
+import {Text, View, Image, SafeAreaView, ScrollView, Button} from "react-native"
 import {loadLocalLog} from "../Service/localLog"
 import DeviceInfo from 'react-native-device-info';
 import {copyText} from "./Function"
@@ -21,13 +21,17 @@ const parseTime = (time) => {
   return `${month}${day} ${hour}:${minutes}:${second}`
 }
 
-export default class LogScreen extends React.Component {
+export default class SettingScreen extends React.Component {
   constructor() {
     super();
     this.state = {
       data: null,
     }
   }
+
+  static navigationOptions = ({ navigation, screenProps }) => ({
+    title: "设置",
+  })
 
   componentDidMount(): void {
     loadLocalLog().then(data => {

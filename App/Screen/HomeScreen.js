@@ -41,7 +41,7 @@ export default class HomeScreen extends React.Component {
 
   static navigationOptions = ({ navigation, screenProps }) => ({
     title: "清单",
-    headerRight: () => <Button title="Log" onPress={()=>{ navigation.navigate('Log'); }} />,
+    headerRight: () => <Button title="设置" onPress={()=>{ navigation.navigate('Setting'); }} />,
   })
 
   componentDidMount(): void {
@@ -97,7 +97,7 @@ export default class HomeScreen extends React.Component {
   addProduct = async () => {
     const {idInput} = this.state
     if (!idInput || isNaN(idInput)) {
-      // todo check fail
+      alert('请先输入商品ID')
       return
     }
     this.setState({loading: true})
@@ -200,8 +200,8 @@ export default class HomeScreen extends React.Component {
             />
 
             <View style={{flexDirection: 'row', padding: 10}}>
-              <GInput style={{flex: 1}} onChange={this.idSubmit}/>
-              <GButton title={'+'} onPress={this.addProduct} style={{marginLeft: 10}}/>
+              <GInput style={{flex: 1}} onChange={this.idSubmit} placeholder={'在此输入商品ID'}/>
+              <GButton title={'点击添加商品'} onPress={this.addProduct} style={{marginLeft: 10}}/>
             </View>
           </SafeAreaView>
 
