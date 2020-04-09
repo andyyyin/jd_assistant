@@ -17,7 +17,8 @@ const loadProductIds = async () => {
       // 844099: newConfig(),
       // 3649920: newConfig(),
       // 100003312839: newConfig(),
-      1813109: newConfig(),
+      // 1813109: newConfig(),
+      // 5572966: newConfig(),
     }
   })
 

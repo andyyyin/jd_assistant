@@ -4,7 +4,7 @@ import {Text, View, Image, TouchableOpacity} from "react-native"
 const styles = {}
 
 styles.container = {
-  borderWidth: 1,
+  borderWidth: 1.5,
   borderColor: 'blue',
   borderRadius: 3,
   flexDirection: 'row',
@@ -16,6 +16,7 @@ styles.container = {
 
 styles.title = {
   fontSize: 16,
+  fontWeight: '500',
   color: 'blue'
 }
 

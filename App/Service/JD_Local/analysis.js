@@ -168,8 +168,14 @@ const fillRankAndPrice = (product) => {
   if (tickets && tickets.length) all.push(...tickets)
   if (combos && combos.length) all.push(...combos)
   let rank = all.sort((a, b) => b.productOff - a.productOff)
-  let deleteIndex
-  while ((deleteIndex = rank.findIndex((p, i) => i > 0 && p.supply >= rank[i - 1].supply)) && deleteIndex > 0) {
+  let deleteIndex;
+  const checkWeedOut = (prom, index) => {
+    if (index === 0) return false
+    let lastProm = rank[index - 1]
+    if (prom.pureOff && !lastProm.pureOff) return false
+    return prom.supply >= lastProm.supply
+  }
+  while ((deleteIndex = rank.findIndex(checkWeedOut)) && deleteIndex > 0) {
     rank.splice(deleteIndex, 1)
   }
   product.promRank = rank

@@ -1,15 +1,20 @@
 import React from 'react';
-import {StatusBar, Text, View, Image, TouchableOpacity, ScrollView, RefreshControl, Button,
-  KeyboardAvoidingView, SafeAreaView, Alert, TouchableWithoutFeedback} from "react-native"
+import {
+  StatusBar, Text, View, Image, AppState, ScrollView, RefreshControl, Button,
+  KeyboardAvoidingView, SafeAreaView, Alert, TouchableWithoutFeedback, Clipboard
+} from "react-native"
 import { SwipeListView } from 'react-native-swipe-list-view'
 import jdRemote from "../Service/JD"
 import jdLocal from "../Service/JD_Local"
 import JDTask from '../Service/JD/task'
+import {checkClipboardForPid} from "./Function"
 import {Ticket, GInput, GButton} from "./Widget"
+import GlobalStyle from '../Style'
+import api from '../Service/Api';
 
 const jd = jdRemote.available ? jdRemote : jdLocal
 
-const styles = {}
+const styles = {...GlobalStyle}
 styles.productContainer = {
   flexDirection: 'row',
   paddingTop: 4,
@@ -26,6 +31,27 @@ styles.promFont = {
   ...styles.font,
   color: 'red'
 }
+styles.preAddBack = {
+  position: 'absolute',
+  top: 12,
+  left: 12,
+  width: styles.screen.width - 90,
+  height: 26,
+  backgroundColor: '#fff',
+}
+styles.preAddText = {
+  color: 'green',
+  fontSize: 12,
+  lineHeight: 13,
+  width: styles.screen.width - 120,
+  height: 26,
+}
+styles.preAddCancel = {
+  width: 30,
+  height: 26,
+  alignItems: 'center',
+  justifyContent: 'center',
+}
 
 export default class HomeScreen extends React.Component {
   constructor() {
@@ -35,23 +61,49 @@ export default class HomeScreen extends React.Component {
       products: null,
       loading: false,
       testData: null,
+      preAddName: null,
     }
     this.load().then()
+    this.checkClipboard()
   }
 
   static navigationOptions = ({ navigation, screenProps }) => ({
     title: "清单",
-    headerRight: () => <Button title="设置" onPress={()=>{ navigation.navigate('Setting'); }} />,
+    headerRight: () => (
+      <TouchableWithoutFeedback onPress={()=>{navigation.navigate('Setting')}}>
+        <View style={{paddingHorizontal: 15, paddingVertical: 12}}>
+          <Image source={require('../Image/setting.png')}/>
+        </View>
+      </TouchableWithoutFeedback>
+    )
   })
 
   componentDidMount(): void {
     JDTask.init().then()
+    AppState.addEventListener('change', this._handleAppStateChange);
+  }
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
   }
 
   load = async () => {
     const productList = await jd.loadProducts()
     this.setProductFromList(productList)
   }
+
+  _handleAppStateChange = (nextAppState) => {
+    if (nextAppState === 'active') this.checkClipboard()
+  }
+
+  checkClipboard = () => {
+    checkClipboardForPid().then(pid => {
+      if (!pid) return
+      this.setState({idInput: pid}, () => {
+        this.pidCheck().then()
+      })
+    })
+  }
+
   refresh = () => {
     this.setState({loading: true}, () => {
       this.load().then(() => {
@@ -93,6 +145,20 @@ export default class HomeScreen extends React.Component {
   }
 
   idSubmit = (idInput) => this.setState({idInput})
+
+  pidCheck = async () => {
+    const pid = this.state.idInput
+    const product = await api.getProduct2(pid)
+    if (!product || !product[pid]) return
+    this.setState({preAddName: product[pid].name})
+  }
+
+  clearInput = () => {
+    this.setState({
+      preAddName: null,
+      idInput: null,
+    })
+  }
 
   addProduct = async () => {
     const {idInput} = this.state
@@ -148,9 +214,9 @@ export default class HomeScreen extends React.Component {
                             {/*  </View>*/}
                             {/*))}*/}
                           </View>
-                          <View style={{flexDirection: 'row'}}>
+                          <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
                             {product.tickets.map((t, index) => (
-                              <View style={{marginRight: 10}} key={product.id + 't' + index}>
+                              <View style={{marginRight: 5, marginTop: 2}} key={product.id + 't' + index}>
                                 <Ticket text={t.text} size={12}/>
                               </View>
                             ))}
@@ -199,9 +265,23 @@ export default class HomeScreen extends React.Component {
               rightOpenValue={-50}
             />
 
-            <View style={{flexDirection: 'row', padding: 10}}>
+            <View style={{flexDirection: 'row', padding: 10, position: 'relative'}}>
               <GInput style={{flex: 1}} onChange={this.idSubmit} placeholder={'在此输入商品ID'}/>
-              <GButton title={'点击添加商品'} onPress={this.addProduct} style={{marginLeft: 10}}/>
+              <GButton title={'添加'} onPress={this.addProduct} style={{marginLeft: 10}}/>
+              {this.state.preAddName &&
+                <View style={styles.preAddBack}>
+                  <Text style={styles.preAddText} numberOfLines={2} ellipsizeMode={'tail'}>
+                    {this.state.preAddName}
+                  </Text>
+                  <View style={{position: 'absolute', top: 0, right: 0,}}>
+                    <TouchableWithoutFeedback onPress={this.clearInput}>
+                      <View style={styles.preAddCancel}>
+                        <Image source={require('../Image/cancel.png')} style={{width: 16, height: 16, opacity: 0.5}}/>
+                      </View>
+                    </TouchableWithoutFeedback>
+                  </View>
+                </View>
+              }
             </View>
           </SafeAreaView>
 

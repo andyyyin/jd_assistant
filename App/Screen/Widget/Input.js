@@ -24,6 +24,7 @@ export default ({onChange, style, placeholder}) => {
       <TextInput
         onChangeText={onChange}
         placeholder={placeholder}
+        placeholderTextColor={'#aaa'}
         style={styles.input}
       />
     </View>

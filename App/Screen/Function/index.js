@@ -8,3 +8,10 @@ export const copyText = (str) => {
   Clipboard.setString(str+'')
   alert('copy: '+ str)
 }
+
+export const checkClipboardForPid = async () => {
+  const str = await Clipboard.getString()
+  if (!str) return
+  const match = str.match(/https:\/\/item.m.jd.com\/product\/(\d+)\.html/i)
+  return match && match[1]
+}
