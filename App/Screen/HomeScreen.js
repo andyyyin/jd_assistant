@@ -88,7 +88,11 @@ export default class HomeScreen extends React.Component {
 
   load = async () => {
     const productList = await jd.loadProducts()
-    this.setProductFromList(productList)
+    if (productList) {
+      this.setProductFromList(productList)
+    } else {
+      this.setState({products: []})
+    }
   }
 
   _handleAppStateChange = (nextAppState) => {
